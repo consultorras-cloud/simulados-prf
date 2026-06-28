@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PRF – Português: Aula 08 (Pontuação)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 24px 16px; }
+  .container { max-width: 820px; margin: 0 auto; }
+  .header { text-align: center; padding: 36px 24px 28px; background: linear-gradient(135deg, #1a1f2e, #252d3d); border-radius: 16px; margin-bottom: 28px; border: 1px solid #2d3748; }
+  .badge { display: inline-block; background: #2563eb; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+  .header p { font-size: 13px; color: #94a3b8; }
+  .meta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .meta span { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 4px 12px; font-size: 12px; color: #cbd5e1; }
+  .progress-bar-wrap { background: #1e293b; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #2d3748; display: flex; align-items: center; gap: 16px; }
+  .progress-bar-outer { flex: 1; background: #0f1117; border-radius: 99px; height: 8px; overflow: hidden; }
+  .progress-bar-inner { height: 8px; background: linear-gradient(90deg, #2563eb, #60a5fa); border-radius: 99px; width: 0%; transition: width 0.4s; }
+  .progress-text { font-size: 12px; color: #94a3b8; white-space: nowrap; min-width: 80px; text-align: right; }
+  .timer-wrap { background: #1e293b; border: 1px solid #2d3748; border-radius: 12px; padding: 12px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+  .timer-label { font-size: 12px; color: #94a3b8; }
+  .timer-value { font-size: 20px; font-weight: 700; color: #60a5fa; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+  .card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 14px; padding: 24px; margin-bottom: 16px; transition: border-color 0.2s; }
+  .card:hover { border-color: #3b4a6b; }
+  .card.answered { border-color: #2563eb44; }
+  .card.correct { border-color: #22c55e; background: #14291e; }
+  .card.wrong { border-color: #ef4444; background: #2a1414; }
+  .question-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .q-number { background: #2563eb; color: #fff; font-size: 12px; font-weight: 700; min-width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .q-level { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; margin-left: auto; }
+  .level-facil { background: #14532d; color: #4ade80; }
+  .level-medio { background: #1e3a5f; color: #60a5fa; }
+  .level-dificil { background: #450a0a; color: #f87171; }
+  .q-text { font-size: 15px; line-height: 1.7; color: #e2e8f0; flex: 1; }
+  .options { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-option { flex: 1; min-width: 110px; padding: 12px 8px; border-radius: 10px; border: 1px solid #334155; background: #0f1117; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-option:hover:not(:disabled) { background: #1e293b; color: #e2e8f0; border-color: #4b6cb7; }
+  .btn-option.selected-c { background: #1e3a5f; border-color: #2563eb; color: #93c5fd; }
+  .btn-option.selected-e { background: #2a1f1a; border-color: #ea580c; color: #fdba74; }
+  .btn-option:disabled { cursor: default; opacity: 0.7; }
+  .btn-option.correct-answer { background: #14532d !important; border-color: #22c55e !important; color: #4ade80 !important; }
+  .btn-option.wrong-answer { background: #450a0a !important; border-color: #ef4444 !important; color: #f87171 !important; }
+  .feedback { margin-top: 14px; padding: 12px 16px; border-radius: 10px; font-size: 13px; line-height: 1.6; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: #14291e; border: 1px solid #22c55e44; color: #86efac; }
+  .feedback.nok { background: #2a1414; border: 1px solid #ef444444; color: #fca5a5; }
+  .btn-confirm { width: 100%; margin-top: 20px; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-size: 15px; font-weight: 700; border: none; cursor: pointer; letter-spacing: 0.5px; transition: opacity 0.2s; }
+  .btn-confirm:hover:not(:disabled) { opacity: 0.88; }
+  .btn-confirm:disabled { opacity: 0.4; cursor: default; }
+  .resultado { display: none; background: linear-gradient(135deg, #1a1f2e, #252d3d); border: 1px solid #2d3748; border-radius: 16px; padding: 36px 24px; text-align: center; margin-top: 28px; }
+  .resultado.show { display: block; }
+  .resultado h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .resultado .score { font-size: 52px; font-weight: 800; margin: 16px 0 8px; }
+  .resultado .classification { font-size: 14px; font-weight: 700; padding: 6px 18px; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
+  .class-critico { background: #450a0a; color: #f87171; }
+  .class-intermediario { background: #1e3a5f; color: #60a5fa; }
+  .class-competitivo { background: #1a2e1a; color: #4ade80; }
+  .class-aprovacao { background: #14532d; color: #86efac; }
+  .resultado-detalhe { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
+  .btn-copy { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-copy:hover { background: #2d3748; color: #fff; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="badge">Simulado PRF - Ciclo 1</div>
+    <h1>Língua Portuguesa — Aula 08</h1>
+    <p>Emprego dos Sinais de Pontuação (Vírgula) · Banca: CEBRASPE</p>
+    <div class="meta">
+      <span>📋 10 itens</span>
+      <span>⚖️ Certo ou Errado</span>
+      <span>📈 3 Fáceis · 4 Médias · 3 Difíceis</span>
+    </div>
+  </div>
+
+  <div class="timer-wrap">
+    <span class="timer-label">⏱ Tempo decorrido</span>
+    <span class="timer-value" id="timer">00:00</span>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+    <span class="progress-text" id="progressText">0 de 10</span>
+  </div>
+
+  <div id="questoes"></div>
+
+  <button class="btn-confirm" id="btnFinalizar" disabled onclick="finalizar()">Finalizar Simulado</button>
+
+  <div class="resultado" id="resultado">
+    <h2>Resultado Final</h2>
+    <div class="score" id="scoreDisplay"></div>
+    <div class="classification" id="classDisplay"></div>
+    <div class="resultado-detalhe" id="detalheDisplay"></div>
+    <button class="btn-copy" onclick="copiarResultado()">📋 Copiar resultado pro chat</button>
+  </div>
+
+</div>
+
+<script>
+const questoes = [
+  {
+    num: 1, nivel: "facil",
+    texto: "A vírgula é essencialmente um marcador de pausa para respiração; portanto, é correto separar o sujeito do verbo na ordem direta da frase, caso este sujeito seja longo, para facilitar a leitura fluida.",
+    gabarito: "E",
+    explicacao: "ERRADO. A aula ressalta: 'esqueça aquela história de que a vírgula é para respirar'. A vírgula é um marcador sintático. Na ordem direta (SuVeCA), não se pode separar sujeito de verbo, independentemente do tamanho do sujeito."
+  },
+  {
+    num: 2, nivel: "facil",
+    texto: "A vírgula é corretamente utilizada para separar elementos coordenados de uma série enumerativa, ou seja, termos repetidos ou que exercem a mesma função sintática.",
+    gabarito: "C",
+    explicacao: "CERTO. É a clássica 'vírgula da listinha'. Ela enumera itens de mesma função, como na repetição de sujeitos, objetos, ou predicativos."
+  },
+  {
+    num: 3, nivel: "facil",
+    texto: "Palavras e expressões denotativas de situação, retificação ou de continuidade — como 'isto é', 'ou seja', 'por exemplo' e 'aliás' — devem obrigatoriamente vir isoladas por vírgulas.",
+    gabarito: "C",
+    explicacao: "CERTO. Expressões explicativas e retificativas devem sempre ser marcadas por vírgulas, parênteses ou travessões por regra geral."
+  },
+  {
+    num: 4, nivel: "medio",
+    texto: "Em regra geral cobrada em provas (inclusive ratificada pela ABL), o uso da vírgula é obrigatório para separar adjuntos adverbiais deslocados de longa extensão, normalmente considerados aqueles com três ou mais palavras.",
+    gabarito: "C",
+    explicacao: "CERTO. A doutrina majoritária aceita pelas bancas define que um adjunto até duas palavras é curto (vírgula facultativa), e com três ou mais é longo (vírgula obrigatória, quando deslocado)."
+  },
+  {
+    num: 5, nivel: "medio",
+    texto: "Na frase 'Eu trabalhava, e meu filho gastava o dinheiro.', o uso da vírgula antes da conjunção 'e' constitui um erro gramatical, pois não se separa orações ligadas por conjunção aditiva.",
+    gabarito: "E",
+    explicacao: "ERRADO. O material ensina que a vírgula antes do 'e' é facultativa (e muito recomendável) quando a conjunção separa orações com SUJEITOS DIFERENTES ('Eu' e 'meu filho')."
+  },
+  {
+    num: 6, nivel: "medio",
+    texto: "As conjunções coordenativas, quando deslocadas para o meio da oração que introduzem (ordem indireta), devem vir isoladas por vírgulas. Uma exceção a essa regra é a conjunção 'mas', que não aceita deslocamento.",
+    gabarito: "C",
+    explicacao: "CERTO. Conjunções como 'porém', 'logo' e 'portanto' aceitam deslocamento e pedem vírgulas ('Seu lugar, portanto, não é aqui'). O 'mas' deve sempre iniciar a oração adversativa."
+  },
+  {
+    num: 7, nivel: "medio",
+    texto: "No trecho 'Os servidores, que fizeram greve, levaram falta.', a supressão das vírgulas preservaria a correção gramatical, mas alteraria o sentido original do texto.",
+    gabarito: "C",
+    explicacao: "CERTO. Retirar as vírgulas transforma a oração adjetiva explicativa (todos os servidores fizeram greve) em restritiva (apenas uma parte dos servidores fez greve). O sentido muda, mas a gramática continua correta."
+  },
+  {
+    num: 8, nivel: "dificil",
+    texto: "Na sentença 'A Carta Magna de 1988, que trouxe muitos direitos difusos, é rígida.', é possível suprimir as vírgulas para dar sentido restritivo ao termo anterior, mantendo-se a perfeita coerência e correção gramatical.",
+    gabarito: "E",
+    explicacao: "ERRADO. Como só existe uma 'Carta Magna de 1988', o substantivo já está restrito ao máximo por natureza. A retirada das vírgulas geraria uma inadequação semântica, pois não faz sentido restringir algo único. As vírgulas são obrigatórias neste caso."
+  },
+  {
+    num: 9, nivel: "dificil",
+    texto: "No período 'quase uma em cada dez pessoas no mundo adoece', a inserção de uma vírgula logo após a palavra 'pessoas' não causaria prejuízo à correção gramatical, pois serviria apenas para isolar o adjunto adverbial 'no mundo'.",
+    gabarito: "E",
+    explicacao: "ERRADO. Este é o exemplo exato da banca no PDF. A vírgula após 'pessoas' separaria indevidamente o sujeito do verbo ('pessoas... adoece'), causando erro grave de pontuação."
+  },
+  {
+    num: 10, nivel: "dificil",
+    texto: "Quando um trecho de valor adjetivo e explicativo estiver intercalado e separado por duas vírgulas (ex: 'um corredor estreito, formado por decodificadores, se esconde'), a retirada de apenas uma dessas vírgulas gera erro gramatical.",
+    gabarito: "C",
+    explicacao: "CERTO. Deixar apenas uma vírgula em uma intercalação resulta na separação do sujeito em relação ao seu próprio verbo. Para alterar o sentido de explicativo para restritivo, seria necessário retirar as DUAS vírgulas."
+  }
+];
+
+const respostas = {};
+let respondidas = 0;
+let timerInterval;
+let segundos = 0;
+
+function iniciarTimer() {
+  timerInterval = setInterval(() => {
+    segundos++;
+    const m = String(Math.floor(segundos / 60)).padStart(2, '0');
+    const s = String(segundos % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = m + ':' + s;
+  }, 1000);
+}
+
+function atualizarProgresso() {
+  const pct = (respondidas / questoes.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = respondidas + ' de ' + questoes.length;
+  if (respondidas === questoes.length) {
+    document.getElementById('btnFinalizar').disabled = false;
+  }
+}
+
+function nomeNivel(n) {
+  if (n === 'facil') return 'Fácil';
+  if (n === 'medio') return 'Médio';
+  return 'Difícil';
+}
+
+function renderQuestoes() {
+  const container = document.getElementById('questoes');
+  questoes.forEach(q => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.id = 'card-' + q.num;
+    div.innerHTML = `
+      <div class="question-header">
+        <div class="q-number">${q.num}</div>
+        <div class="q-text">${q.texto}</div>
+        <div class="q-level level-${q.nivel}">${nomeNivel(q.nivel)}</div>
+      </div>
+      <div class="options">
+        <button class="btn-option" id="btn-c-${q.num}" onclick="responder(${q.num}, 'C')">✔ CERTO</button>
+        <button class="btn-option" id="btn-e-${q.num}" onclick="responder(${q.num}, 'E')">✘ ERRADO</button>
+      </div>
+      <div class="feedback" id="feedback-${q.num}"></div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function responder(num, opcao) {
+  if (respostas[num] !== undefined) return;
+  respostas[num] = opcao;
+  respondidas++;
+
+  const btnC = document.getElementById('btn-c-' + num);
+  const btnE = document.getElementById('btn-e-' + num);
+  btnC.disabled = true;
+  btnE.disabled = true;
+
+  const q = questoes.find(x => x.num === num);
+  const acertou = opcao === q.gabarito;
+
+  if (opcao === 'C') btnC.classList.add('selected-c');
+  else btnE.classList.add('selected-e');
+
+  if (acertou) {
+    document.getElementById('card-' + num).classList.add('correct');
+  } else {
+    document.getElementById('card-' + num).classList.add('wrong');
+    if (q.gabarito === 'C') btnC.classList.add('correct-answer');
+    else btnE.classList.add('correct-answer');
+    if (opcao === 'C') btnC.classList.add('wrong-answer');
+    else btnE.classList.add('wrong-answer');
+  }
+
+  const fb = document.getElementById('feedback-' + num);
+  fb.className = 'feedback show ' + (acertou ? 'ok' : 'nok');
+  fb.innerHTML = (acertou ? '✅ ' : '❌ ') + q.explicacao;
+
+  atualizarProgresso();
+}
+
+function getClassificacao(pct) {
+  if (pct <= 40) return { label: 'Crítico', cls: 'class-critico' };
+  if (pct <= 60) return { label: 'Intermediário', cls: 'class-intermediario' };
+  if (pct <= 80) return { label: 'Competitivo', cls: 'class-competitivo' };
+  return { label: 'Nível Aprovação', cls: 'class-aprovacao' };
+}
+
+function finalizar() {
+  clearInterval(timerInterval);
+  document.getElementById('btnFinalizar').disabled = true;
+
+  let acertos = 0;
+  questoes.forEach(q => { if (respostas[q.num] === q.gabarito) acertos++; });
+  const pct = Math.round((acertos / questoes.length) * 100);
+  const { label, cls } = getClassificacao(pct);
+
+  const m = String(Math.floor(segundos / 60)).padStart(2, '0');
+  const s = String(segundos % 60).padStart(2, '0');
+
+  document.getElementById('scoreDisplay').textContent = acertos + '/' + questoes.length;
+  const clsEl = document.getElementById('classDisplay');
+  clsEl.textContent = label;
+  clsEl.className = 'classification ' + cls;
+  document.getElementById('detalheDisplay').textContent = pct + '% de aproveitamento · Tempo: ' + m + ':' + s;
+
+  const res = document.getElementById('resultado');
+  res.classList.add('show');
+  res.scrollIntoView({ behavior: 'smooth' });
+}
+
+function copiarResultado() {
+  let acertos = 0;
+  questoes.forEach(q => { if (respostas[q.num] === q.gabarito) acertos++; });
+  const pct = Math.round((acertos / questoes.length) * 100);
+  const { label } = getClassificacao(pct);
+  const m = String(Math.floor(segundos / 60)).padStart(2, '0');
+  const s = String(segundos % 60).padStart(2, '0');
+
+  let txt = `📊 Resultado — Simulado PRF Bloco 1: Língua Portuguesa (Aula 08)\n`;
+  txt += `Acertos: ${acertos}/${questoes.length} (${pct}%)\n`;
+  txt += `Classificação: ${label}\n`;
+  txt += `Tempo: ${m}:${s}\n\n`;
+  txt += `Detalhes por questão:\n`;
+  questoes.forEach(q => {
+    const r = respostas[q.num] || '—';
+    const status = r === q.gabarito ? '✅' : '❌';
+    txt += `${status} Q${q.num} [${nomeNivel(q.nivel)}] — Resp: ${r} | Gabarito: ${q.gabarito}\n`;
+  });
+
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✅ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar resultado pro chat', 2000);
+  });
+}
+
+renderQuestoes();
+iniciarTimer();
+</script>
+</body>
+</html>
